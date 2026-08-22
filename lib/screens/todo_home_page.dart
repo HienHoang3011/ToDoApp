@@ -14,8 +14,8 @@ class TodoHomePage extends StatefulWidget {
 
 class _TodoHomePageState extends State<TodoHomePage> {
   Future<void> _showAddTodoDialog() async {
-    final TextEditingController textController = TextEditingController();
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    String title = '';
 
     await showDialog<void>(
       context: context,
@@ -27,7 +27,6 @@ class _TodoHomePageState extends State<TodoHomePage> {
             child: TextFormField(
               key: const Key('new-todo-field'),
               autofocus: true,
-              controller: textController,
               decoration: const InputDecoration(
                 hintText: 'Ví dụ: Hoàn thành báo cáo',
                 labelText: 'Tên công việc',
@@ -41,10 +40,11 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 }
                 return null;
               },
+              onChanged: (String value) => title = value,
               onFieldSubmitted: (_) => _submitTodo(
                 dialogContext,
                 formKey,
-                textController.text,
+                title,
               ),
             ),
           ),
@@ -58,7 +58,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
               onPressed: () => _submitTodo(
                 dialogContext,
                 formKey,
-                textController.text,
+                title,
               ),
               child: const Text('Thêm'),
             ),
@@ -66,8 +66,6 @@ class _TodoHomePageState extends State<TodoHomePage> {
         );
       },
     );
-
-    textController.dispose();
   }
 
   Future<void> _submitTodo(

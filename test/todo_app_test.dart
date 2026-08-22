@@ -12,10 +12,12 @@ void main() {
       MemoryTodoStore(),
       clock: () => DateTime.fromMicrosecondsSinceEpoch(100),
     );
+    addTearDown(() => _disposeTestApp(tester, controller));
     await tester.pumpWidget(TodoApp(controller: controller));
 
     await tester.tap(find.byKey(const Key('add-todo-button')));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.enterText(
       find.byKey(const Key('new-todo-field')),
       'Chuẩn bị demo',
@@ -34,6 +36,7 @@ void main() {
     final TodoController controller = TodoController(
       MemoryTodoStore(<TodoItem>[todo]),
     );
+    addTearDown(() => _disposeTestApp(tester, controller));
     await controller.loadTodos();
     await tester.pumpWidget(TodoApp(controller: controller));
 
@@ -42,7 +45,11 @@ void main() {
     );
     expect(checkbox.value, isFalse);
 
-    await tester.tap(find.byKey(const Key('todo-checkbox-demo-task')));
+    final Finder checkboxFinder = find.byKey(
+      const Key('todo-checkbox-demo-task'),
+    );
+    await tester.ensureVisible(checkboxFinder);
+    await tester.tap(checkboxFinder);
     await tester.pumpAndSettle();
 
     checkbox = tester.widget<Checkbox>(
@@ -61,13 +68,26 @@ void main() {
     final TodoController controller = TodoController(
       MemoryTodoStore(<TodoItem>[todo]),
     );
+    addTearDown(() => _disposeTestApp(tester, controller));
     await controller.loadTodos();
     await tester.pumpWidget(TodoApp(controller: controller));
 
-    await tester.tap(find.byKey(const Key('delete-todo-remove-me')));
+    final Finder deleteFinder = find.byKey(
+      const Key('delete-todo-remove-me'),
+    );
+    await tester.ensureVisible(deleteFinder);
+    await tester.tap(deleteFinder);
     await tester.pumpAndSettle();
 
     expect(find.text('Việc cần xóa'), findsNothing);
     expect(find.text('Chưa có công việc nào'), findsOneWidget);
   });
+}
+
+Future<void> _disposeTestApp(
+  WidgetTester tester,
+  TodoController controller,
+) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  controller.dispose();
 }
