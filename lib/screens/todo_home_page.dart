@@ -21,7 +21,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('Thêm công việc'),
+          title: const Text('Thêm công việc cần làm'),
           content: Form(
             key: formKey,
             child: TextFormField(
